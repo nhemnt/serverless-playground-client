@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Navbar, Nav } from "react-bootstrap";
+import { Auth } from "aws-amplify";
 
 import { AppContext } from "./libs/contextLib";
 
@@ -10,10 +11,30 @@ import './App.css';
 
 function App() {
   const [isAuthenticated, userHasAuthenticated] = useState(false);
-  function handleLogout() {
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+  async function handleLogout() {
+    await Auth.signOut();
     userHasAuthenticated(false);
   }
+
+  async function onLoad() {
+    try {
+      await Auth.currentSession();
+      userHasAuthenticated(true);
+    }
+    catch (e) {
+      if (e !== 'No current user') {
+        alert(e);
+      }
+    }
+    setIsAuthenticating(false);
+  }
+
+  useEffect(() => {
+    onLoad();
+  }, []);
   return (
+    !isAuthenticating &&
     <div className="App container">
       <Navbar bg="light" expand="lg">
         <Navbar.Brand><Link to="/">Notes</Link></Navbar.Brand>
