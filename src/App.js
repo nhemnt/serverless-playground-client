@@ -8,6 +8,7 @@ import { AppContext } from "./libs/contextLib";
 import Routes from "./Routes";
 
 import './App.css';
+import Loader from './components/Loader';
 
 
 
@@ -15,6 +16,7 @@ function App() {
   const history = useHistory();
   const [isAuthenticated, userHasAuthenticated] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const [isLoader, setLoader] = useState(true);
   async function handleLogout() {
     await Auth.signOut();
     userHasAuthenticated(false);
@@ -25,12 +27,16 @@ function App() {
     try {
       await Auth.currentSession();
       userHasAuthenticated(true);
+      setLoader(false);
     }
     catch (e) {
       if (e !== 'No current user') {
+        setLoader(false);
         alert(e);
+
       }
     }
+    setLoader(false);
     setIsAuthenticating(false);
   }
 
@@ -75,10 +81,12 @@ function App() {
       </Navbar>
       <AppContext.Provider value={{
         isAuthenticated,
-        userHasAuthenticated
+        userHasAuthenticated,
+        setLoader
       }}>
         <Routes />
       </AppContext.Provider>
+      {isLoader && <Loader/>}
     </div>
   );
 }

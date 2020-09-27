@@ -7,7 +7,7 @@ import { onError } from "../libs/errorLib";
 import "./Home.css";
 const Home = () => {
   const [notes, setNotes] = useState([]);
-  const { isAuthenticated } = useAppContext();
+  const { isAuthenticated, setLoader } = useAppContext();
   const [isLoading, setIsLoading] = useState(true);
 
   function renderNotesList(notes) {
@@ -53,11 +53,14 @@ const Home = () => {
         return;
       }
       try {
+        setLoader(true);
         const notes = await loadNotes();
         setNotes(notes);
       } catch (e) {
+        setLoader(false);
         onError(e);
       }
+      setLoader(false);
       setIsLoading(false);
     }
     onLoad();

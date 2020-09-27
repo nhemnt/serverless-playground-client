@@ -6,12 +6,14 @@ import { s3Upload } from "../libs/awsLib";
 import { Form } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import config from "../config";
+import { useAppContext } from "../libs/contextLib";
 import "./Notes.css";
 
 
 export default function Notes() {
   const file = useRef(null);
   const { id } = useParams();
+  const { setLoader } = useAppContext();
   const history = useHistory();
   const [note, setNote] = useState(null);
   const [content, setContent] = useState("");
@@ -89,9 +91,9 @@ export default function Notes() {
 
     async function onLoad() {
       try {
+        setLoader(true);
         const note = await loadNote();
         const { content, attachment } = note;
-        debugger
         if (attachment) {
           note.attachmentURL = await Storage.vault.get(attachment);
         }
@@ -99,8 +101,10 @@ export default function Notes() {
         setContent(content);
         setNote(note);
       } catch (e) {
+        setLoader(false);
         onError(e);
       }
+      setLoader(false);
     }
     onLoad();
   }, [id]);
