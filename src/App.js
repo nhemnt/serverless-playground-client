@@ -52,7 +52,14 @@ function App() {
 
 
           {isAuthenticated
-            ? <Nav onClick={handleLogout}>Logout</Nav>
+            ?
+            <>
+              <Nav.Link>
+                <Link to="/settings">Settings</Link>
+              </Nav.Link>
+              <Nav onClick={handleLogout}>Logout</Nav>
+            </>
+
             : <>
               <Nav>
                 <Nav.Link>
