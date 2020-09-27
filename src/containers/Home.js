@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { API } from "aws-amplify";
 import { ListGroup, ListGroupItem } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { useAppContext } from "../libs/contextLib";
 import { onError } from "../libs/errorLib";
 import "./Home.css";
@@ -9,7 +11,23 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   function renderNotesList(notes) {
-    return null;
+    return [{}].concat(notes).map((note, i) =>
+      i !== 0 ? (
+        <Link key={note.noteId} to={`/notes/${note.noteId}`}>
+          <ListGroupItem header={note.content.trim().split("\n")[0]}>
+            {"Created: " + new Date(note.createdAt).toLocaleString()}
+          </ListGroupItem>
+        </Link>
+      ) : (
+        <Link key="new" to="/notes/new">
+          <ListGroupItem>
+            <h4>
+              <b>{"\uFF0B"}</b> Create a new note
+            </h4>
+          </ListGroupItem>
+        </Link>
+      )
+    );
   }
   function renderLander() {
     return (
@@ -27,6 +45,25 @@ const Home = () => {
         <ListGroup>{!isLoading && renderNotesList(notes)}</ListGroup>
       </div>
     );
+  }
+
+  useEffect(() => {
+    async function onLoad() {
+      if (!isAuthenticated) {
+        return;
+      }
+      try {
+        const notes = await loadNotes();
+        setNotes(notes);
+      } catch (e) {
+        onError(e);
+      }
+      setIsLoading(false);
+    }
+    onLoad();
+  }, [isAuthenticated]);
+  function loadNotes() {
+    return API.get("notes", "/notes");
   }
   return (
     <div className="Home">
