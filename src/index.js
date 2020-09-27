@@ -11,6 +11,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 Amplify.configure({
   Auth: {
+    //The mandatorySignIn flag for Auth is set to true because we
+    // want our users to be signed in before they can interact with our app.
     mandatorySignIn: true,
     region: config.cognito.REGION,
     userPoolId: config.cognito.USER_POOL_ID,
