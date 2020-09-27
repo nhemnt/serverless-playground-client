@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { Button, FormGroup, FormControl, FormLabel } from "react-bootstrap";
 import { Auth } from "aws-amplify";
+import { useHistory } from "react-router-dom";
 
 import { useAppContext } from "../libs/contextLib";
 
 import "./Login.css";
 
+
 export default function Login() {
+  const history = useHistory();
+
   const { userHasAuthenticated } = useAppContext();
 
   const [email, setEmail] = useState("");
@@ -15,16 +19,13 @@ export default function Login() {
   function validateForm() {
     return email.length > 0 && password.length > 0;
   } 
-  
-  // function handleSubmit(event) {
-  //   event.preventDefault();
-  // }
 
   async function handleSubmit(event) {
     event.preventDefault();
     try {
       await Auth.signIn(email, password);
       userHasAuthenticated(true);
+      history.push("/");
     } catch (e) {
       alert(e.message);
     }
